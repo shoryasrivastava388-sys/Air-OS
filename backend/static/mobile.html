@@ -1,0 +1,1378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Air-OS">
+  <meta name="theme-color" content="#07090e">
+  <title>Air-OS Mobile Companion | Spatial Wi-Fi Bridge</title>
+  
+  <link rel="icon" type="image/jpeg" href="/static/airos_icon.jpg">
+  <link rel="apple-touch-icon" href="/static/airos_icon.jpg">
+  <link rel="manifest" href="/manifest.json">
+
+  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #07090e;
+      --card-bg: rgba(14, 18, 28, 0.85);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --cyan: #00f0ff;
+      --cyan-dim: rgba(0, 240, 255, 0.15);
+      --purple: #c084fc;
+      --purple-dim: rgba(192, 132, 252, 0.15);
+      --green: #34d399;
+      --rose: #f43f5e;
+      --amber: #fbbf24;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background: var(--bg);
+      background-image: 
+        radial-gradient(circle at 50% 0%, rgba(0, 240, 255, 0.08) 0%, transparent 60%),
+        radial-gradient(circle at 50% 100%, rgba(192, 132, 252, 0.06) 0%, transparent 70%);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      padding-bottom: max(16px, env(safe-area-inset-bottom));
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Top App Bar */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      padding-top: max(12px, env(safe-area-inset-top));
+      background: rgba(7, 9, 14, 0.92);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 0 12px rgba(0, 240, 255, 0.25);
+    }
+
+    .brand-icon img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .brand-text h1 {
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      color: #fff;
+    }
+
+    .brand-text span {
+      font-size: 10px;
+      font-family: var(--font-mono);
+      color: var(--cyan);
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    .header-pills {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .status-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-family: var(--font-mono);
+      font-weight: 600;
+      background: rgba(14, 18, 28, 0.8);
+      border: 1px solid var(--card-border);
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--rose);
+      box-shadow: 0 0 6px var(--rose);
+      transition: all 0.3s ease;
+    }
+
+    .status-dot.online {
+      background: var(--green);
+      box-shadow: 0 0 8px var(--green);
+    }
+
+    .btn-install {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      background: var(--cyan-dim);
+      color: var(--cyan);
+      border: 1px solid rgba(0, 240, 255, 0.3);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-install:active {
+      transform: scale(0.95);
+    }
+
+    /* Main Container: Single-Page Cockpit */
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 14px;
+      gap: 12px;
+      max-width: 540px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    /* Hero Soul Core Card */
+    .soul-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 22px;
+      padding: 18px 16px;
+      position: relative;
+      overflow: hidden;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      transition: all 0.4s ease;
+    }
+
+    .soul-card.transferred {
+      border-color: rgba(192, 132, 252, 0.4);
+      box-shadow: 0 0 32px rgba(192, 132, 252, 0.18), 0 8px 32px rgba(0, 0, 0, 0.5);
+    }
+
+    .soul-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .soul-orb-container {
+      position: relative;
+      width: 56px;
+      height: 56px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .soul-orb-ring {
+      position: absolute;
+      inset: -4px;
+      border-radius: 50%;
+      border: 1.5px dashed rgba(0, 240, 255, 0.35);
+      animation: spin 16s linear infinite;
+    }
+
+    .soul-card.transferred .soul-orb-ring {
+      border: 1.5px solid rgba(192, 132, 252, 0.6);
+      border-top-color: var(--cyan);
+      border-bottom-color: var(--green);
+      animation: spin 6s linear infinite, pulseGlow 2.5s ease-in-out infinite;
+    }
+
+    .soul-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 1.5px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 0 16px rgba(0, 240, 255, 0.4);
+      transition: all 0.4s ease;
+    }
+
+    .soul-card.transferred .soul-avatar {
+      box-shadow: 0 0 24px rgba(192, 132, 252, 0.7);
+      transform: scale(1.05);
+    }
+
+    .soul-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    @keyframes spin {
+      100% { transform: rotate(360deg); }
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% { filter: drop-shadow(0 0 8px rgba(192, 132, 252, 0.4)); }
+      50% { filter: drop-shadow(0 0 20px rgba(192, 132, 252, 0.9)); }
+    }
+
+    .soul-meta {
+      flex: 1;
+    }
+
+    .soul-state-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 10px;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: var(--cyan-dim);
+      color: var(--cyan);
+      margin-bottom: 4px;
+    }
+
+    .soul-card.transferred .soul-state-tag {
+      background: var(--purple-dim);
+      color: var(--purple);
+    }
+
+    .soul-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.25;
+    }
+
+    .soul-subtitle {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* Soul Details Grid */
+    .soul-details {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .detail-item {
+      background: rgba(10, 14, 22, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      padding: 7px 8px;
+      border-radius: 12px;
+      text-align: center;
+    }
+
+    .detail-label {
+      font-size: 9.5px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      display: block;
+    }
+
+    .detail-val {
+      font-size: 12.5px;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      color: #fff;
+      margin-top: 2px;
+      display: block;
+    }
+
+    /* Soul Action Button */
+    .soul-actions {
+      margin-top: 12px;
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-transfer {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid rgba(0, 240, 255, 0.3);
+      transition: all 0.2s ease;
+      background: linear-gradient(135deg, rgba(0, 240, 255, 0.2), rgba(37, 99, 235, 0.3));
+      color: #fff;
+    }
+
+    .soul-card.transferred .btn-transfer {
+      background: linear-gradient(135deg, rgba(192, 132, 252, 0.25), rgba(219, 39, 119, 0.3));
+      border-color: rgba(192, 132, 252, 0.4);
+    }
+
+    .btn-transfer:active {
+      transform: scale(0.98);
+    }
+
+    .btn-inspect {
+      padding: 10px 12px;
+      border-radius: 12px;
+      font-size: 11.5px;
+      font-weight: 600;
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-main);
+      border: 1px solid var(--card-border);
+      cursor: pointer;
+    }
+
+    .btn-inspect:active {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    /* Dialogue Stream */
+    .chat-section {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 22px;
+      overflow: hidden;
+      min-height: 270px;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.3);
+    }
+
+    .chat-header {
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      background: rgba(10, 14, 22, 0.4);
+    }
+
+    .chat-header h3 {
+      font-size: 11.5px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .tts-toggle {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+
+    .tts-toggle input {
+      accent-color: var(--cyan);
+    }
+
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 320px;
+      scroll-behavior: smooth;
+    }
+
+    .chat-bubble {
+      max-width: 86%;
+      padding: 10px 13px;
+      border-radius: 16px;
+      font-size: 13px;
+      line-height: 1.45;
+      position: relative;
+      animation: popIn 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+      word-break: break-word;
+    }
+
+    @keyframes popIn {
+      0% { opacity: 0; transform: translateY(6px) scale(0.98); }
+      100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .bubble-user {
+      align-self: flex-end;
+      background: linear-gradient(135deg, rgba(0, 240, 255, 0.25), rgba(37, 99, 235, 0.45));
+      border: 1px solid rgba(0, 240, 255, 0.3);
+      color: #fff;
+      border-bottom-right-radius: 4px;
+    }
+
+    .bubble-assistant {
+      align-self: flex-start;
+      background: rgba(22, 27, 40, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: #f1f5f9;
+      border-bottom-left-radius: 4px;
+    }
+
+    .bubble-source {
+      font-size: 9px;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      opacity: 0.75;
+      margin-bottom: 3px;
+    }
+
+    .bubble-action-tag {
+      display: inline-block;
+      margin-top: 6px;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 10.5px;
+      font-family: var(--font-mono);
+      font-weight: 600;
+      background: rgba(52, 211, 153, 0.15);
+      color: var(--green);
+      border: 1px solid rgba(52, 211, 153, 0.3);
+    }
+
+    /* Live Voice Listening Banner */
+    .listening-banner {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 10px 14px;
+      background: rgba(244, 63, 94, 0.12);
+      border-top: 1px solid rgba(244, 63, 94, 0.3);
+      color: #fda4af;
+      font-size: 11.5px;
+      font-weight: 600;
+    }
+
+    .listening-banner.active {
+      display: flex;
+    }
+
+    .soundwave {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      height: 14px;
+    }
+
+    .soundwave span {
+      width: 3px;
+      height: 100%;
+      background: #f43f5e;
+      border-radius: 3px;
+      animation: wave 1s ease-in-out infinite;
+    }
+
+    .soundwave span:nth-child(2) { animation-delay: 0.15s; }
+    .soundwave span:nth-child(3) { animation-delay: 0.3s; }
+    .soundwave span:nth-child(4) { animation-delay: 0.45s; }
+
+    @keyframes wave {
+      0%, 100% { height: 4px; }
+      50% { height: 14px; }
+    }
+
+    /* Input Dock */
+    .input-dock {
+      padding: 10px;
+      background: rgba(10, 14, 22, 0.5);
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .input-text-wrap {
+      flex: 1;
+    }
+
+    .input-text {
+      width: 100%;
+      padding: 11px 14px;
+      background: rgba(7, 9, 14, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 14px;
+      font-size: 13.5px;
+      color: #fff;
+      outline: none;
+      transition: border-color 0.2s ease;
+    }
+
+    .input-text:focus {
+      border-color: var(--cyan);
+    }
+
+    .input-text::placeholder {
+      color: #64748b;
+    }
+
+    .btn-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: all 0.2s ease;
+    }
+
+    .btn-icon:active {
+      transform: scale(0.92);
+    }
+
+    .btn-send {
+      background: linear-gradient(135deg, #0ea5e9, #2563eb);
+      color: #fff;
+      box-shadow: 0 2px 10px rgba(14, 165, 233, 0.3);
+    }
+
+    .btn-send svg {
+      width: 16px;
+      height: 16px;
+      fill: #fff;
+    }
+
+    .btn-mic {
+      background: rgba(22, 27, 40, 0.9);
+      color: var(--cyan);
+      border: 1px solid rgba(0, 240, 255, 0.3);
+    }
+
+    .btn-mic.listening {
+      background: #e11d48;
+      color: #fff;
+      border-color: #f43f5e;
+      box-shadow: 0 0 16px rgba(225, 29, 72, 0.6);
+      animation: pulseMic 1.4s infinite;
+    }
+
+    @keyframes pulseMic {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.06); }
+    }
+
+    .btn-mic svg {
+      width: 18px;
+      height: 18px;
+      fill: currentColor;
+    }
+
+    /* Quick Remote PC Macros */
+    .macros-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 12px 14px;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+    }
+
+    .macros-title {
+      font-size: 10.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--text-muted);
+      margin-bottom: 9px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .macros-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+
+    .btn-macro {
+      background: rgba(10, 14, 22, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 12px;
+      padding: 9px 4px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text-main);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-macro:active {
+      transform: scale(0.95);
+      background: var(--cyan-dim);
+      border-color: var(--cyan);
+    }
+
+    .btn-macro svg {
+      width: 16px;
+      height: 16px;
+      fill: var(--cyan);
+    }
+
+    /* Memory Drawer */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      z-index: 100;
+      padding: 16px;
+      align-items: flex-end;
+      justify-content: center;
+    }
+
+    .modal-overlay.open {
+      display: flex;
+    }
+
+    .modal-content {
+      background: #0d111a;
+      border: 1px solid rgba(0, 240, 255, 0.2);
+      border-radius: 24px;
+      width: 100%;
+      max-width: 520px;
+      max-height: 80vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.6);
+      animation: slideUp 0.25s ease-out;
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+
+    .modal-header {
+      padding: 14px 18px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .modal-header h2 {
+      font-size: 14px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .btn-close {
+      background: rgba(255, 255, 255, 0.08);
+      border: none;
+      color: #fff;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .modal-body {
+      padding: 14px;
+      overflow-y: auto;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      line-height: 1.5;
+      color: #cbd5e1;
+    }
+
+    .memory-item {
+      background: rgba(14, 18, 28, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      border-radius: 10px;
+      padding: 10px;
+      margin-bottom: 8px;
+    }
+
+    .memory-item .mem-time {
+      color: var(--cyan);
+      font-size: 9.5px;
+    }
+
+    .memory-item .mem-prompt {
+      color: #fff;
+      font-weight: 600;
+      margin-top: 2px;
+    }
+
+    .memory-item .mem-resp {
+      color: #94a3b8;
+      margin-top: 3px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top App Bar -->
+  <header>
+    <div class="brand">
+      <div class="brand-icon">
+        <img src="/static/airos_icon.jpg" alt="Air-OS">
+      </div>
+      <div class="brand-text">
+        <h1>AIR-OS COMPANION</h1>
+        <span id="ipLabel">CONNECTING...</span>
+      </div>
+    </div>
+    <div class="header-pills">
+      <button class="btn-install" id="btnInstall" onclick="installPWA()">
+        + App
+      </button>
+      <div class="status-badge">
+        <div class="status-dot" id="wsStatusDot"></div>
+        <span id="wsStatusText">OFFLINE</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Single-Page Unified Cockpit -->
+  <main>
+    <!-- Soul Core Card -->
+    <section class="soul-card" id="soulCard">
+      <div class="soul-header">
+        <div class="soul-orb-container">
+          <div class="soul-orb-ring"></div>
+          <div class="soul-avatar">
+            <img src="/static/airos_icon.jpg" alt="Soul Core">
+          </div>
+        </div>
+        <div class="soul-meta">
+          <div class="soul-state-tag" id="soulStateTag">
+            <span>●</span> <span id="soulLocationLabel">DESKTOP DOCKED</span>
+          </div>
+          <div class="soul-title" id="soulTitle">Observing PC Feed</div>
+          <div class="soul-subtitle" id="soulSubtitle">Webcam monitoring user presence...</div>
+        </div>
+      </div>
+
+      <div class="soul-details">
+        <div class="detail-item">
+          <span class="detail-label">User Presence</span>
+          <span class="detail-val" id="presenceVal">Detecting...</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Prompt Ver.</span>
+          <span class="detail-val" id="promptVerVal">v4</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Memories</span>
+          <span class="detail-val" id="memoryCountVal">0</span>
+        </div>
+      </div>
+
+      <div class="soul-actions">
+        <button class="btn-transfer" id="btnToggleSoul" onclick="toggleSoulTransfer()">
+          <span id="btnSoulText">Summon Soul to Phone</span>
+        </button>
+        <button class="btn-inspect" onclick="openMemoryModal()">Inspect Memory</button>
+      </div>
+    </section>
+
+    <!-- Cognitive Dialogue Feed -->
+    <section class="chat-section">
+      <div class="chat-header">
+        <h3>
+          <svg style="width: 13px; height: 13px; fill: currentColor;" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
+          Cognitive Conversation
+        </h3>
+        <label class="tts-toggle">
+          <input type="checkbox" id="ttsCheckbox" checked>
+          <span>Speak Replies</span>
+        </label>
+      </div>
+
+      <div class="chat-messages" id="chatFeed">
+        <div class="chat-bubble bubble-assistant">
+          <div class="bubble-source">⚡ Air-OS Companion</div>
+          Welcome! Synced over Wi-Fi with your laptop. Speak or type below to log memories and command Windows.
+        </div>
+      </div>
+
+      <!-- Live Voice Listening Banner -->
+      <div class="listening-banner" id="listeningBanner">
+        <div class="soundwave">
+          <span></span><span></span><span></span><span></span>
+        </div>
+        <span id="listeningText">Listening to your voice... Speak now!</span>
+      </div>
+
+      <!-- Input Dock -->
+      <div class="input-dock">
+        <button class="btn-icon btn-mic" id="btnMic" onclick="toggleSpeechRecognition()" title="Voice Input">
+          <svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.91-3c-.49 0-.9.36-.98.85C16.52 14.2 14.47 16 12 16s-4.52-1.8-4.93-4.15c-.08-.49-.49-.85-.98-.85-.61 0-1.09.54-1 1.14.49 3 2.89 5.35 5.91 5.78V20c0 .55.45 1 1 1s1-.45 1-1v-2.08c3.02-.43 5.42-2.78 5.91-5.78.1-.6-.39-1.14-1-1.14z"/></svg>
+        </button>
+        <div class="input-text-wrap">
+          <input type="text" class="input-text" id="promptInput" placeholder="Message companion or command PC..." onkeydown="handleInputKey(event)">
+        </div>
+        <button class="btn-icon btn-send" id="btnSend" onclick="sendTextMessage()" title="Send">
+          <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+        </button>
+      </div>
+    </section>
+
+    <!-- Remote PC Hardware Actions -->
+    <section class="macros-card">
+      <div class="macros-title">
+        <span>Instant PC Remote Actions</span>
+        <span style="color: var(--cyan); font-family: var(--font-mono);">Wi-Fi Direct</span>
+      </div>
+      <div class="macros-grid">
+        <button class="btn-macro" onclick="triggerMacro('LOCK_PC')">
+          <svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+          Lock PC
+        </button>
+        <button class="btn-macro" onclick="triggerMacro('SHOW_DESKTOP')">
+          <svg viewBox="0 0 24 24"><path d="M21 2H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h7l-2 3v1h8v-1l-2-3h7c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H3V4h18v12z"/></svg>
+          Desktop
+        </button>
+        <button class="btn-macro" onclick="triggerMacro('MUTE')">
+          <svg viewBox="0 0 24 24"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>
+          Mute
+        </button>
+        <button class="btn-macro" onclick="triggerMacro('PLAY_PAUSE')">
+          <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
+          Media
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <!-- Memory Inspector Drawer -->
+  <div class="modal-overlay" id="memoryModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Laptop memory.json Live Store</h2>
+        <button class="btn-close" onclick="closeMemoryModal()">✕</button>
+      </div>
+      <div class="modal-body" id="memoryModalBody">
+        Loading memory store from laptop...
+      </div>
+    </div>
+  </div>
+
+  <!-- Install App Guide Modal -->
+  <div class="modal-overlay" id="installGuideModal">
+    <div class="modal-content" style="max-width: 480px;">
+      <div class="modal-header">
+        <h2>Install Air-OS Companion App</h2>
+        <button class="btn-close" onclick="closeInstallGuide()">✕</button>
+      </div>
+      <div class="modal-body" style="font-family: var(--font-sans); font-size: 13px; line-height: 1.6; color: #e2e8f0;">
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px; padding: 12px; background: rgba(0, 240, 255, 0.08); border: 1px solid rgba(0, 240, 255, 0.2); border-radius: 14px;">
+          <img src="/static/airos_icon.jpg" style="width: 44px; height: 44px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.2);" />
+          <div>
+            <div style="font-weight: 700; color: #fff;">Air-OS Companion</div>
+            <div style="font-size: 11px; color: var(--cyan);">Standalone PWA • Full-Screen Native Mode</div>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 14px;">
+          <strong style="color: #fff; display: block; margin-bottom: 4px;">🍎 On iPhone (Safari):</strong>
+          <ol style="margin-left: 20px; font-size: 12.5px; color: #cbd5e1;">
+            <li>Tap the <strong>Share</strong> button <span style="display: inline-block; padding: 1px 6px; background: rgba(255,255,255,0.1); border-radius: 4px;">⎋</span> (square with arrow at the bottom).</li>
+            <li>Scroll down and tap <strong>"Add to Home Screen"</strong>.</li>
+            <li>Tap <strong>"Add"</strong> in the top-right corner.</li>
+          </ol>
+        </div>
+
+        <div>
+          <strong style="color: #fff; display: block; margin-bottom: 4px;">🤖 On Android (Chrome / Brave):</strong>
+          <ol style="margin-left: 20px; font-size: 12.5px; color: #cbd5e1;">
+            <li>Tap the <strong>three dots (⋮)</strong> in the top-right corner.</li>
+            <li>Tap <strong>"Install app"</strong> or <strong>"Add to Home screen"</strong>.</li>
+          </ol>
+        </div>
+
+        <div style="margin-top: 16px; padding: 10px; background: rgba(52, 211, 153, 0.1); border: 1px solid rgba(52, 211, 153, 0.25); border-radius: 10px; font-size: 11.5px; color: var(--green);">
+          ✓ Once added, Air-OS opens with its own app icon, zero browser bars, and full-screen microphone access!
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let ws = null;
+    let wsConnected = false;
+    let soulState = "desktop";
+    let recognition = null;
+    let isListening = false;
+    let lastMemories = [];
+    let deferredPrompt = null;
+
+    const ipLabel = document.getElementById("ipLabel");
+    const wsStatusDot = document.getElementById("wsStatusDot");
+    const wsStatusText = document.getElementById("wsStatusText");
+    const soulCard = document.getElementById("soulCard");
+    const soulLocationLabel = document.getElementById("soulLocationLabel");
+    const soulTitle = document.getElementById("soulTitle");
+    const soulSubtitle = document.getElementById("soulSubtitle");
+    const presenceVal = document.getElementById("presenceVal");
+    const promptVerVal = document.getElementById("promptVerVal");
+    const memoryCountVal = document.getElementById("memoryCountVal");
+    const btnSoulText = document.getElementById("btnSoulText");
+    const chatFeed = document.getElementById("chatFeed");
+    const promptInput = document.getElementById("promptInput");
+    const btnMic = document.getElementById("btnMic");
+    const listeningBanner = document.getElementById("listeningBanner");
+    const listeningText = document.getElementById("listeningText");
+    const ttsCheckbox = document.getElementById("ttsCheckbox");
+    const memoryModal = document.getElementById("memoryModal");
+    const memoryModalBody = document.getElementById("memoryModalBody");
+    const btnInstall = document.getElementById("btnInstall");
+
+    ipLabel.textContent = location.host || "127.0.0.1:8000";
+
+    // PWA Service Worker Registration
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch(e => console.warn(e));
+    }
+
+    // PWA Install Prompt
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      btnInstall.classList.add('visible');
+    });
+
+    function installPWA() {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then((choice) => {
+          if (choice.outcome === 'accepted') {
+            deferredPrompt = null;
+          }
+        });
+      } else {
+        document.getElementById('installGuideModal').classList.add('open');
+      }
+    }
+
+    function closeInstallGuide() {
+      document.getElementById('installGuideModal').classList.remove('open');
+    }
+
+    // Connect WebSocket
+    function initWebSocket() {
+      const protocol = location.protocol === "https:" ? "wss:" : "ws:";
+      const host = location.host || "127.0.0.1:8000";
+      const wsUrl = `${protocol}//${host}/ws/mobile`;
+
+      wsStatusText.textContent = "CONNECTING...";
+      wsStatusDot.classList.remove("online");
+
+      try {
+        ws = new WebSocket(wsUrl);
+
+        ws.onopen = () => {
+          wsConnected = true;
+          wsStatusText.textContent = "ONLINE";
+          wsStatusDot.classList.add("online");
+        };
+
+        ws.onmessage = (event) => {
+          try {
+            const data = JSON.parse(event.data);
+            handleIncomingMessage(data);
+          } catch (e) {}
+        };
+
+        ws.onclose = () => {
+          wsConnected = false;
+          wsStatusText.textContent = "OFFLINE";
+          wsStatusDot.classList.remove("online");
+          setTimeout(initWebSocket, 2500);
+        };
+
+        ws.onerror = () => ws.close();
+      } catch (err) {
+        setTimeout(initWebSocket, 3000);
+      }
+    }
+
+    function handleIncomingMessage(msg) {
+      if (!msg || !msg.type) return;
+
+      switch (msg.type) {
+        case "mobile_init":
+        case "state_sync":
+          updateSoulState(msg.soul_state || "desktop");
+          updatePresence(msg.user_present, msg.idle_seconds);
+          if (msg.system_prompt_version !== undefined) {
+            promptVerVal.textContent = "v" + msg.system_prompt_version;
+          }
+          if (msg.stats && msg.stats.total_interactions !== undefined) {
+            memoryCountVal.textContent = msg.stats.total_interactions;
+          }
+          if (msg.recent_memories) {
+            lastMemories = msg.recent_memories;
+          }
+          break;
+
+        case "telemetry":
+          updateSoulState(msg.soul_state || soulState);
+          updatePresence(msg.presence_detected, msg.idle_seconds);
+          if (msg.total_interactions !== undefined) {
+            memoryCountVal.textContent = msg.total_interactions;
+          }
+          if (msg.prompt_version !== undefined) {
+            promptVerVal.textContent = "v" + msg.prompt_version;
+          }
+          break;
+
+        case "TRANSFER_SOUL":
+          updateSoulState("mobile");
+          appendAssistantBubble("✨ " + (msg.message || "User walked away from PC. Air-OS Soul transferred to Mobile!"));
+          if (ttsCheckbox.checked) speakText("Air-OS soul transferred to your mobile device.");
+          break;
+
+        case "RETURN_SOUL":
+          updateSoulState("desktop");
+          appendAssistantBubble("🖥️ " + (msg.message || "User returned to desk. Air-OS Soul docked back to PC!"));
+          if (ttsCheckbox.checked) speakText("Welcome back. Soul docked back to your laptop.");
+          break;
+
+        case "chat_reply":
+          appendAssistantBubble(msg.response, msg.actions);
+          if (ttsCheckbox.checked) {
+            const cleanText = msg.response.replace(/\[ACTION:[^\]]+\]/g, "").trim();
+            if (cleanText) speakText(cleanText);
+          }
+          if (msg.total_interactions) {
+            memoryCountVal.textContent = msg.total_interactions;
+          }
+          break;
+
+        case "memory_store_data":
+          lastMemories = msg.interactions || [];
+          renderMemoryList();
+          break;
+      }
+    }
+
+    function updateSoulState(state) {
+      soulState = state;
+      if (state === "mobile") {
+        soulCard.classList.add("transferred");
+        soulLocationLabel.textContent = "SOUL ON MOBILE";
+        soulTitle.textContent = "Active Mobile Companion";
+        soulSubtitle.textContent = "Carrying laptop memories & voice-ready";
+        btnSoulText.textContent = "Dock Soul to Laptop";
+      } else {
+        soulCard.classList.remove("transferred");
+        soulLocationLabel.textContent = "DESKTOP DOCKED";
+        soulTitle.textContent = "Observing PC Feed";
+        soulSubtitle.textContent = "Webcam monitoring user presence...";
+        btnSoulText.textContent = "Summon Soul to Phone";
+      }
+    }
+
+    function updatePresence(present, idleSec) {
+      if (present) {
+        presenceVal.textContent = "At Desk (Active)";
+        presenceVal.style.color = "var(--green)";
+      } else {
+        const sec = idleSec !== undefined ? Math.round(idleSec) : 0;
+        presenceVal.textContent = `Away (${sec}s)`;
+        presenceVal.style.color = "var(--amber)";
+      }
+    }
+
+    function toggleSoulTransfer() {
+      if (navigator.vibrate) navigator.vibrate([15]);
+      const target = soulState === "desktop" ? "mobile" : "desktop";
+      updateSoulState(target);
+      if (wsConnected && ws) {
+        ws.send(JSON.stringify({ type: "transfer_soul", target: target }));
+      } else {
+        fetch("/api/mobile/transfer", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ target: target })
+        }).catch(() => {});
+      }
+    }
+
+    function sendTextMessage() {
+      const text = promptInput.value.trim();
+      if (!text) return;
+      promptInput.value = "";
+      if (navigator.vibrate) navigator.vibrate([15]);
+
+      appendUserBubble(text, "mobile_text");
+      sendToBackend(text, "mobile_text");
+    }
+
+    function handleInputKey(event) {
+      if (event.key === "Enter") sendTextMessage();
+    }
+
+    function sendToBackend(text, source) {
+      if (wsConnected && ws) {
+        ws.send(JSON.stringify({
+          type: "chat",
+          text: text,
+          source: source,
+          auto_execute: true
+        }));
+      } else {
+        fetch("/api/mobile/input", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text, source, auto_execute: true })
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data && data.response) {
+            appendAssistantBubble(data.response, data.actions);
+            if (ttsCheckbox.checked) {
+              const clean = data.response.replace(/\[ACTION:[^\]]+\]/g, "").trim();
+              if (clean) speakText(clean);
+            }
+          }
+        })
+        .catch(() => {
+          appendAssistantBubble("⚠️ Connection error: Failed to reach laptop backend.");
+        });
+      }
+    }
+
+    function triggerMacro(actionName) {
+      if (navigator.vibrate) navigator.vibrate([20]);
+      if (wsConnected && ws) {
+        ws.send(JSON.stringify({ type: "pc_action", action: actionName }));
+      } else {
+        fetch("/api/mobile/macro", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: actionName })
+        }).catch(() => {});
+      }
+      appendUserBubble(`[Macro: ${actionName}]`, "macro");
+    }
+
+    function appendUserBubble(text, source) {
+      const div = document.createElement("div");
+      div.className = "chat-bubble bubble-user";
+      const icon = source === "mobile_voice" ? "🎙️ Voice" : "💬 You";
+      div.innerHTML = `<div class="bubble-source">${icon}</div>${escapeHtml(text)}`;
+      chatFeed.appendChild(div);
+      chatFeed.scrollTop = chatFeed.scrollHeight;
+    }
+
+    function appendAssistantBubble(text, actions) {
+      const div = document.createElement("div");
+      div.className = "chat-bubble bubble-assistant";
+      let content = `<div class="bubble-source">⚡ Air-OS</div>${escapeHtml(text)}`;
+      if (actions && actions.length > 0) {
+        actions.forEach(a => {
+          content += `<div class="bubble-action-tag">✓ Executed: ${escapeHtml(a.raw || a.payload || a.type)}</div>`;
+        });
+      }
+      div.innerHTML = content;
+      chatFeed.appendChild(div);
+      chatFeed.scrollTop = chatFeed.scrollHeight;
+    }
+
+    function escapeHtml(str) {
+      if (!str) return "";
+      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    // Speech Recognition
+    function setupSpeechRecognition() {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) return null;
+
+      const recog = new SpeechRecognition();
+      recog.continuous = false;
+      recog.interimResults = true;
+      recog.lang = "en-US";
+
+      recog.onstart = () => {
+        isListening = true;
+        btnMic.classList.add("listening");
+        listeningBanner.classList.add("active");
+        listeningText.textContent = "Listening to your voice...";
+      };
+
+      recog.onresult = (event) => {
+        let transcript = "";
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          transcript += event.results[i][0].transcript;
+        }
+        if (transcript) {
+          listeningText.textContent = `"${transcript}"`;
+          promptInput.value = transcript;
+        }
+      };
+
+      recog.onerror = () => stopSpeechRecognition();
+
+      recog.onend = () => {
+        const spokenText = promptInput.value.trim();
+        stopSpeechRecognition();
+        if (spokenText) {
+          promptInput.value = "";
+          appendUserBubble(spokenText, "mobile_voice");
+          sendToBackend(spokenText, "mobile_voice");
+        }
+      };
+
+      return recog;
+    }
+
+    function toggleSpeechRecognition() {
+      if (navigator.vibrate) navigator.vibrate([15]);
+      if (isListening) stopSpeechRecognition();
+      else startSpeechRecognition();
+    }
+
+    function startSpeechRecognition() {
+      if (!recognition) recognition = setupSpeechRecognition();
+      if (!recognition) {
+        alert("Speech Recognition not supported in this mobile browser.");
+        return;
+      }
+      try { recognition.start(); } catch(e) {}
+    }
+
+    function stopSpeechRecognition() {
+      isListening = false;
+      btnMic.classList.remove("listening");
+      listeningBanner.classList.remove("active");
+      if (recognition) {
+        try { recognition.stop(); } catch(e) {}
+      }
+    }
+
+    function speakText(text) {
+      if (!window.speechSynthesis) return;
+      try {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.rate = 1.05;
+        window.speechSynthesis.speak(utterance);
+      } catch (e) {}
+    }
+
+    // Memory Drawer
+    function openMemoryModal() {
+      if (navigator.vibrate) navigator.vibrate([10]);
+      memoryModal.classList.add("open");
+      renderMemoryList();
+      if (wsConnected && ws) {
+        ws.send(JSON.stringify({ type: "get_memories" }));
+      } else {
+        fetch("/api/dream/memory")
+          .then(res => res.json())
+          .then(data => {
+            lastMemories = data.interactions || [];
+            renderMemoryList();
+          })
+          .catch(() => {});
+      }
+    }
+
+    function closeMemoryModal() {
+      memoryModal.classList.remove("open");
+    }
+
+    function renderMemoryList() {
+      if (!lastMemories || lastMemories.length === 0) {
+        memoryModalBody.innerHTML = "<p style='color:#64748b;'>No memories logged yet.</p>";
+        return;
+      }
+      let html = "";
+      const reversed = [...lastMemories].reverse();
+      reversed.forEach(m => {
+        const timeStr = m.timestamp ? new Date(m.timestamp).toLocaleTimeString() : "";
+        const srcTag = m.source ? `[${m.source.toUpperCase()}]` : "";
+        const dreamTag = m.analyzed_in_dream ? "🌙 Analyzed" : "⭐ New";
+        html += `
+          <div class="memory-item">
+            <div class="mem-time">${escapeHtml(timeStr)} ${escapeHtml(srcTag)} • ${dreamTag}</div>
+            <div class="mem-prompt">User: ${escapeHtml(m.prompt || "")}</div>
+            <div class="mem-resp">AI: ${escapeHtml((m.response || "").substring(0, 140))}...</div>
+          </div>
+        `;
+      });
+      memoryModalBody.innerHTML = html;
+    }
+
+    window.addEventListener("load", () => {
+      initWebSocket();
+    });
+  </script>
+</body>
+</html>

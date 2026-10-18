@@ -1,0 +1,60 @@
+[
+  {
+    "dream_id": "dream_1792263407",
+    "timestamp": "2026-10-18T00:26:54.411141",
+    "duration_seconds": 6.9,
+    "model_used": "qwen2.5:0.5b",
+    "memories_analyzed": 3,
+    "new_prompt_version": 1,
+    "summary": "Recent Air-OS interactions and user requests.",
+    "insights": [
+      "Recent Air-OS interactions",
+      "User requested to open Spotify and play their study playlist",
+      "User requested to mute their audio output",
+      "User asked what is on their screen",
+      "User requested to open a Python script running on port 8000"
+    ],
+    "prompt_length": 77
+  },
+  {
+    "dream_id": "dream_1792263457",
+    "timestamp": "2026-10-18T00:27:40.347699",
+    "duration_seconds": 2.69,
+    "model_used": "qwen2.5:0.5b",
+    "memories_analyzed": 0,
+    "new_prompt_version": 2,
+    "summary": "No recent Air-OS interactions available.",
+    "insights": [
+      "Processed 0 interactions across chat, vision, and gesture channels.",
+      "Ensured prompt retains zero-latency Windows action tag execution."
+    ],
+    "prompt_length": 84
+  },
+  {
+    "dream_id": "dream_1792263702",
+    "timestamp": "2026-10-18T00:31:46.606193",
+    "duration_seconds": 3.83,
+    "model_used": "qwen2.5:0.5b",
+    "memories_analyzed": 0,
+    "new_prompt_version": 3,
+    "summary": "No recent interaction logs available.",
+    "insights": [
+      "Processed 0 interactions across chat, vision, and gesture channels.",
+      "Ensured prompt retains zero-latency Windows action tag execution."
+    ],
+    "prompt_length": 62
+  },
+  {
+    "dream_id": "dream_1792335902",
+    "timestamp": "2026-10-18T20:35:06.425005",
+    "duration_seconds": 4.15,
+    "model_used": "qwen2.5:0.5b",
+    "memories_analyzed": 5,
+    "new_prompt_version": 4,
+    "summary": "Dream cycle completed with heuristic memory synthesis.",
+    "insights": [
+      "Dream inference notice: Failed to connect to Ollama. Please check that Ollama is downloaded, running and accessible. https://ollama.com/download"
+    ],
+    "prompt_length": 993
+  }
+]

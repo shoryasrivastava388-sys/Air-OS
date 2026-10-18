@@ -1,0 +1,22 @@
+{
+  "combos": {
+    "portal_magic_circle": {
+      "enabled": true,
+      "name": "Portal Magic Circle",
+      "action_type": "none",
+      "action_payload": "https://chatgpt.com"
+    },
+    "x_shield": {
+      "enabled": true,
+      "name": "X-Shield Barrier",
+      "action_type": "none",
+      "action_payload": "SHOW_DESKTOP"
+    }
+  },
+  "bindings": {
+    "thumb_index_pinch": "left_click",
+    "thumb_index_hold": "drag_hold",
+    "thumb_middle_pinch": "right_click",
+    "thumb_ring_pinch": "scroll"
+  }
+}

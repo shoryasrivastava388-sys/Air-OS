@@ -1,0 +1,5 @@
+# ARCHIVED PROMPT v1 | Dream ID: dream_1792263457
+# Timestamp: 20261018_002740
+# Pre-Dream Insights: ["Processed 0 interactions across chat, vision, and gesture channels.", "Ensured prompt retains zero-latency Windows action tag execution."]
+
+Mute your audio output, open Spotify for you, and ask what is on your screen.

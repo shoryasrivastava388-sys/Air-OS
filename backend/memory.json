@@ -1,0 +1,155 @@
+{
+  "version": "1.0.0",
+  "created_at": "2026-10-18T00:05:13.111103",
+  "last_updated": "2026-10-18T09:16:26.648137",
+  "total_interactions": 8,
+  "dream_cycles_completed": 4,
+  "interactions": [
+    {
+      "id": "mem_1792262210895",
+      "timestamp": "2026-10-18T00:06:50.895697",
+      "source": "chat",
+      "prompt": "Can you open Spotify and play my study playlist?",
+      "response": "Opening Spotify for you! [ACTION:OPEN_URL:https://open.spotify.com]",
+      "model": "local",
+      "actions": [
+        {
+          "type": "url",
+          "payload": "https://open.spotify.com"
+        }
+      ],
+      "workflow_state": {
+        "hands_count": 1,
+        "active_gesture": "MOVE"
+      },
+      "analyzed_in_dream": true,
+      "dream_cycle_id": "dream_1792263407"
+    },
+    {
+      "id": "mem_1792262210911",
+      "timestamp": "2026-10-18T00:06:50.911865",
+      "source": "voice",
+      "prompt": "Mute the audio please, I am taking a phone call.",
+      "response": "Muted your Windows audio output! [ACTION:HOTKEY:MUTE]",
+      "model": "local",
+      "actions": [
+        {
+          "type": "hotkey",
+          "payload": "MUTE"
+        }
+      ],
+      "workflow_state": {
+        "hands_count": 0,
+        "active_gesture": "IDLE"
+      },
+      "analyzed_in_dream": true,
+      "dream_cycle_id": "dream_1792263407"
+    },
+    {
+      "id": "mem_1792262210928",
+      "timestamp": "2026-10-18T00:06:50.928860",
+      "source": "vision",
+      "prompt": "What is on my screen right now?",
+      "response": "I see a code editor and terminal running python uvicorn on port 8000.",
+      "model": "local",
+      "actions": [],
+      "workflow_state": {
+        "camera_enabled": true
+      },
+      "analyzed_in_dream": true,
+      "dream_cycle_id": "dream_1792263407"
+    },
+    {
+      "id": "mem_1792264266571",
+      "timestamp": "2026-10-18T00:41:06.571255",
+      "source": "vision",
+      "prompt": "Analyze what you see in front of my webcam. Describe any objects, people, hands, or text.",
+      "response": "The image shows a man with a beard and mustache, wearing a green shirt, sitting in a room. He is holding his hand up to his face, possibly making a funny or serious face. The room has a bed in the background, and there is a tripod visible in the scene. The man's facial expression and the presence of the tripod suggest that this could be a photo shoot or a video recording.\n\nThe room appears to be a bedroom, with the bed occupying a significant portion of the space. The man's facial expression and the tripod suggest that the photo or video might be related to a creative project or a personal project, such as a vlog or a short film.",
+      "model": "moondream:1.8b",
+      "actions": [],
+      "workflow_state": {
+        "camera_enabled": true,
+        "hands_count": 0
+      },
+      "analyzed_in_dream": true,
+      "dream_cycle_id": "dream_1792335902"
+    },
+    {
+      "id": "mem_1792294308313",
+      "timestamp": "2026-10-18T09:01:48.313258",
+      "source": "mobile_voice",
+      "prompt": "Hello Air-OS! This is a test voice message from my mobile phone.",
+      "response": "Companion heard: 'Hello Air-OS! This is a test voice message from my mobile phone.'. Memory saved on PC!",
+      "model": "qwen2.5:0.5b",
+      "actions": [],
+      "workflow_state": {
+        "soul_location": "mobile",
+        "user_present_at_pc": false,
+        "idle_seconds": 3.4,
+        "client_ip": "mobile_client",
+        "channel": "wifi_mobile_bridge"
+      },
+      "analyzed_in_dream": true,
+      "executed": [],
+      "dream_cycle_id": "dream_1792335902"
+    },
+    {
+      "id": "mem_1792294324430",
+      "timestamp": "2026-10-18T09:02:04.430560",
+      "source": "mobile_voice",
+      "prompt": "Can you show my desktop?",
+      "response": "Companion heard: 'Can you show my desktop?'. Memory saved on PC!",
+      "model": "qwen2.5:0.5b",
+      "actions": [],
+      "workflow_state": {
+        "soul_location": "mobile",
+        "user_present_at_pc": false,
+        "idle_seconds": 1.1,
+        "client_ip": "127.0.0.1",
+        "channel": "wifi_mobile_bridge"
+      },
+      "analyzed_in_dream": true,
+      "executed": [],
+      "dream_cycle_id": "dream_1792335902"
+    },
+    {
+      "id": "mem_1792295173060",
+      "timestamp": "2026-10-18T09:16:13.060319",
+      "source": "mobile_text",
+      "prompt": "Hi",
+      "response": "Companion heard: 'Hi'. Memory saved on PC!",
+      "model": "qwen2.5:0.5b",
+      "actions": [],
+      "workflow_state": {
+        "soul_location": "mobile",
+        "user_present_at_pc": false,
+        "idle_seconds": 48.4,
+        "client_ip": "192.168.31.148",
+        "channel": "wifi_mobile_bridge"
+      },
+      "analyzed_in_dream": true,
+      "executed": [],
+      "dream_cycle_id": "dream_1792335902"
+    },
+    {
+      "id": "mem_1792295186648",
+      "timestamp": "2026-10-18T09:16:26.648137",
+      "source": "mobile_text",
+      "prompt": "Show desktop",
+      "response": "Companion heard: 'Show desktop'. Memory saved on PC!",
+      "model": "qwen2.5:0.5b",
+      "actions": [],
+      "workflow_state": {
+        "soul_location": "mobile",
+        "user_present_at_pc": false,
+        "idle_seconds": 62.0,
+        "client_ip": "192.168.31.148",
+        "channel": "wifi_mobile_bridge"
+      },
+      "analyzed_in_dream": true,
+      "executed": [],
+      "dream_cycle_id": "dream_1792335902"
+    }
+  ],
+  "last_dream_at": "2026-10-18T20:35:06.422889"
+}
