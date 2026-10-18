@@ -1,8 +1,8 @@
 {
   "version": "1.0.0",
   "created_at": "2026-10-18T00:05:13.111103",
-  "last_updated": "2026-10-18T09:16:26.648137",
-  "total_interactions": 8,
+  "last_updated": "2026-10-19T00:33:29.635707",
+  "total_interactions": 9,
   "dream_cycles_completed": 4,
   "interactions": [
     {
@@ -149,6 +149,24 @@
       "analyzed_in_dream": true,
       "executed": [],
       "dream_cycle_id": "dream_1792335902"
+    },
+    {
+      "id": "mem_1792350209635",
+      "timestamp": "2026-10-19T00:33:29.635707",
+      "source": "mobile_text",
+      "prompt": "hi",
+      "response": "Companion heard: 'hi'. Memory saved on PC!",
+      "model": "qwen2.5:0.5b",
+      "actions": [],
+      "workflow_state": {
+        "soul_location": "mobile",
+        "user_present_at_pc": false,
+        "idle_seconds": 21.7,
+        "client_ip": "192.168.31.18",
+        "channel": "wifi_mobile_bridge"
+      },
+      "analyzed_in_dream": false,
+      "executed": []
     }
   ],
   "last_dream_at": "2026-10-18T20:35:06.422889"

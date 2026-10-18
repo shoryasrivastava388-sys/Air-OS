@@ -786,6 +786,9 @@
       </div>
     </div>
     <div class="header-pills">
+      <a href="/desktop" class="status-badge" style="color:var(--cyan); text-decoration:none; border-color:rgba(0,240,255,0.3); background:rgba(0,240,255,0.08); display:flex; align-items:center; gap:5px;" title="Switch to Full Desktop 3-Deck Cockpit">
+        💻 <span>Full Cockpit</span>
+      </a>
       <button class="btn-install" id="btnInstall" onclick="installPWA()">
         + App
       </button>
@@ -836,6 +839,49 @@
           <span id="btnSoulText">Summon Soul to Phone</span>
         </button>
         <button class="btn-inspect" onclick="openMemoryModal()">Inspect Memory</button>
+      </div>
+    </section>
+
+    <!-- Hardware, Camera & OS Control Cockpit Card -->
+    <section class="macros-card" style="margin-bottom: 14px;">
+      <div class="macros-title">
+        <span>Hardware & Vision Controls</span>
+        <span style="color: var(--cyan); font-family: var(--font-mono);" id="armStatusBadge">PAUSED</span>
+      </div>
+      
+      <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+        <!-- OS Mouse Control Button -->
+        <button class="btn-macro" id="btnToggleArm" onclick="toggleArmState()" style="flex: 1; padding: 11px; flex-direction: row; justify-content: center; gap: 7px; font-size: 11.5px; border-color: rgba(255,255,255,0.12);">
+          <span id="armIcon">🛡️</span>
+          <span id="armBtnLabel" style="font-weight: 700;">OS Mouse: PAUSED</span>
+        </button>
+
+        <!-- Toggle Live Camera View Button -->
+        <button class="btn-macro" id="btnToggleCamView" onclick="toggleCamView()" style="flex: 1; padding: 11px; flex-direction: row; justify-content: center; gap: 7px; font-size: 11.5px; border-color: rgba(0,240,255,0.25);">
+          <span>📷</span>
+          <span id="camBtnLabel" style="font-weight: 700;">Live Camera Feed</span>
+        </button>
+      </div>
+
+      <!-- Live Video Stream Drawer (Collapsible) -->
+      <div id="camStreamContainer" style="display: none; border-radius: 14px; overflow: hidden; border: 1px solid rgba(0, 240, 255, 0.35); position: relative; background: #000; margin-bottom: 10px;">
+        <img id="mobileCamFeed" src="" alt="Live Spatial Camera Stream" style="width: 100%; aspect-ratio: 16/9; object-fit: cover; display: block;" />
+        <div style="position: absolute; bottom: 8px; right: 8px; display: flex; gap: 6px;">
+          <button onclick="toggleCameraHardware()" style="background: rgba(7,9,14,0.85); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 5px 9px; border-radius: 8px; font-size: 10.5px; cursor: pointer; backdrop-filter: blur(8px);">
+            📷 Toggle Hardware
+          </button>
+        </div>
+      </div>
+
+      <!-- Ollama Model Selector -->
+      <div style="display: flex; align-items: center; justify-content: space-between; padding: 9px 12px; background: rgba(7, 9, 14, 0.75); border: 1px solid var(--card-border); border-radius: 12px;">
+        <span style="font-size: 11.5px; color: var(--text-muted); display: flex; align-items: center; gap: 6px;">
+          <span>🧠</span> <strong>Ollama Model:</strong>
+        </span>
+        <select id="mobileModelSelect" style="background: rgba(14, 18, 28, 0.95); border: 1px solid rgba(0,240,255,0.25); color: #fff; padding: 5px 10px; border-radius: 8px; font-size: 11px; font-family: var(--font-mono); outline: none;">
+          <option value="qwen2.5:0.5b">qwen2.5:0.5b</option>
+          <option value="moondream">moondream (vision)</option>
+        </select>
       </div>
     </section>
 
@@ -1178,10 +1224,12 @@
     }
 
     function sendToBackend(text, source) {
+      const chosenModel = (mobileModelSelect && mobileModelSelect.value) || "qwen2.5:0.5b";
       if (wsConnected && ws) {
         ws.send(JSON.stringify({
           type: "chat",
           text: text,
+          model: chosenModel,
           source: source,
           auto_execute: true
         }));
@@ -1189,7 +1237,7 @@
         fetch("/api/mobile/input", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ text, source, auto_execute: true })
+          body: JSON.stringify({ text, source, model: chosenModel, auto_execute: true })
         })
         .then(res => res.json())
         .then(data => {
@@ -1370,8 +1418,111 @@
       memoryModalBody.innerHTML = html;
     }
 
+    // Hardware & Vision Controls
+    let isArmed = false;
+    let isCamViewOpen = false;
+    const btnToggleArm = document.getElementById("btnToggleArm");
+    const armBtnLabel = document.getElementById("armBtnLabel");
+    const armStatusBadge = document.getElementById("armStatusBadge");
+    const armIcon = document.getElementById("armIcon");
+    const camStreamContainer = document.getElementById("camStreamContainer");
+    const mobileCamFeed = document.getElementById("mobileCamFeed");
+    const camBtnLabel = document.getElementById("camBtnLabel");
+    const mobileModelSelect = document.getElementById("mobileModelSelect");
+
+    function updateArmUI(armed) {
+      isArmed = !!armed;
+      if (isArmed) {
+        armStatusBadge.textContent = "ARMED";
+        armStatusBadge.style.color = "var(--green)";
+        armBtnLabel.textContent = "OS Mouse: ARMED";
+        armIcon.textContent = "🛡️";
+        btnToggleArm.style.borderColor = "var(--green)";
+        btnToggleArm.style.background = "rgba(52, 211, 153, 0.12)";
+      } else {
+        armStatusBadge.textContent = "PAUSED";
+        armStatusBadge.style.color = "var(--cyan)";
+        armBtnLabel.textContent = "OS Mouse: PAUSED";
+        armIcon.textContent = "⏸️";
+        btnToggleArm.style.borderColor = "rgba(255, 255, 255, 0.12)";
+        btnToggleArm.style.background = "rgba(10, 14, 22, 0.7)";
+      }
+    }
+
+    async function toggleArmState() {
+      if (navigator.vibrate) navigator.vibrate([15]);
+      try {
+        const res = await fetch("/api/toggle_arm", { method: "POST" });
+        if (res.ok) {
+          const data = await res.json();
+          updateArmUI(data.is_armed);
+        }
+      } catch (e) {
+        if (wsConnected && ws) {
+          ws.send(JSON.stringify({ type: "toggle_arm" }));
+        }
+      }
+    }
+
+    function toggleCamView() {
+      if (navigator.vibrate) navigator.vibrate([15]);
+      isCamViewOpen = !isCamViewOpen;
+      if (isCamViewOpen) {
+        camStreamContainer.style.display = "block";
+        mobileCamFeed.src = "/api/video_feed";
+        camBtnLabel.textContent = "Hide Camera Feed";
+      } else {
+        camStreamContainer.style.display = "none";
+        mobileCamFeed.src = "";
+        camBtnLabel.textContent = "Live Camera Feed";
+      }
+    }
+
+    async function toggleCameraHardware() {
+      if (navigator.vibrate) navigator.vibrate([20]);
+      try {
+        const res = await fetch("/api/camera/toggle", { method: "POST" });
+        if (res.ok) {
+          const data = await res.json();
+          if (!data.camera_enabled) {
+            updateArmUI(false);
+          }
+        }
+      } catch(e) {}
+    }
+
+    async function loadOllamaModels() {
+      try {
+        const res = await fetch("/api/ollama/models");
+        if (res.ok) {
+          const data = await res.json();
+          if (data.models && data.models.length > 0) {
+            mobileModelSelect.innerHTML = "";
+            data.models.forEach(m => {
+              const opt = document.createElement("option");
+              opt.value = m.name;
+              opt.textContent = m.name + (m.has_vision ? " 👁️" : "");
+              mobileModelSelect.appendChild(opt);
+            });
+          }
+        }
+      } catch(e) {}
+    }
+
+    async function checkInitialState() {
+      try {
+        const res = await fetch("/api/state");
+        if (res.ok) {
+          const s = await res.json();
+          updateArmUI(s.is_armed);
+        }
+      } catch(e) {}
+    }
+
     window.addEventListener("load", () => {
       initWebSocket();
+      checkInitialState();
+      loadOllamaModels();
     });
   </script>
 </body>

@@ -20,9 +20,10 @@ try:
     import pyttsx3
 except Exception:
     pyttsx3 = None
-from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import StreamingResponse
+from fastapi.staticfiles import StaticFiles
+from starlette.responses import FileResponse, HTMLResponse, StreamingResponse
 import mediapipe as mp
 from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
@@ -1024,6 +1025,78 @@ app.add_middleware(
 )
 
 app.include_router(mobile_router)
+
+FRONTEND_DIST = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "frontend", "dist")
+STATIC_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "static")
+MOBILE_HTML_PATH = os.path.join(STATIC_DIR, "mobile.html")
+
+assets_dir = os.path.join(FRONTEND_DIST, "assets")
+if os.path.exists(assets_dir):
+    app.mount("/assets", StaticFiles(directory=assets_dir), name="assets")
+
+
+@app.get("/desktop")
+async def get_desktop_ui():
+    """Serves the full luxury desktop cockpit."""
+    index_path = os.path.join(FRONTEND_DIST, "index.html")
+    if os.path.exists(index_path):
+        return FileResponse(index_path, media_type="text/html")
+    return HTMLResponse("<h1>Air-OS Desktop Cockpit</h1><p>frontend/dist not found. Please build frontend.</p>", status_code=404)
+
+
+@app.get("/")
+async def root_router(request: Request):
+    """
+    Intelligent Root Router:
+    - If accessed on mobile or with ?view=mobile -> serves mobile.html
+    - If accessed on desktop/laptop or with ?view=desktop -> serves full desktop cockpit!
+    """
+    view = request.query_params.get("view", "")
+    if view == "mobile":
+        if os.path.exists(MOBILE_HTML_PATH):
+            return FileResponse(MOBILE_HTML_PATH, media_type="text/html")
+    if view == "desktop":
+        index_path = os.path.join(FRONTEND_DIST, "index.html")
+        if os.path.exists(index_path):
+            return FileResponse(index_path, media_type="text/html")
+
+    ua = request.headers.get("user-agent", "").lower()
+    is_mobile = any(k in ua for k in ["iphone", "android", "mobile", "ipad"])
+    if is_mobile:
+        if os.path.exists(MOBILE_HTML_PATH):
+            return FileResponse(MOBILE_HTML_PATH, media_type="text/html")
+
+    index_path = os.path.join(FRONTEND_DIST, "index.html")
+    if os.path.exists(index_path):
+        return FileResponse(index_path, media_type="text/html")
+
+    if os.path.exists(MOBILE_HTML_PATH):
+        return FileResponse(MOBILE_HTML_PATH, media_type="text/html")
+    return HTMLResponse("<h1>Air-OS</h1><p>No UI file found.</p>", status_code=404)
+
+
+@app.get("/favicon.svg")
+async def get_fav_svg():
+    p = os.path.join(FRONTEND_DIST, "favicon.svg")
+    if os.path.exists(p):
+        return FileResponse(p, media_type="image/svg+xml")
+    raise HTTPException(status_code=404)
+
+
+@app.get("/icons.svg")
+async def get_icons_svg():
+    p = os.path.join(FRONTEND_DIST, "icons.svg")
+    if os.path.exists(p):
+        return FileResponse(p, media_type="image/svg+xml")
+    raise HTTPException(status_code=404)
+
+
+@app.get("/airos_icon.jpg")
+async def get_airos_icon():
+    p = os.path.join(FRONTEND_DIST, "airos_icon.jpg")
+    if os.path.exists(p):
+        return FileResponse(p, media_type="image/jpeg")
+    raise HTTPException(status_code=404)
 
 
 @app.get("/health")

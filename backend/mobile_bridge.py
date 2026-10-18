@@ -417,7 +417,6 @@ mobile_bridge = MobileBridgeManager()
 mobile_router = APIRouter(tags=["Mobile Wi-Fi Bridge"])
 
 
-@mobile_router.get("/")
 @mobile_router.get("/mobile")
 async def get_mobile_ui():
     """Serves the standalone mobile web client."""

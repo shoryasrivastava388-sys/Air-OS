@@ -80,6 +80,17 @@ export interface CustomGesture {
   last_triggered?: string | null;
 }
 
+// Dynamic API base for both Vite dev server (5173) and production FastAPI (8000)
+const getApiBase = () => {
+  if (window.location.port === '8000') {
+    return '';
+  }
+  const protocol = window.location.protocol === 'https:' ? 'https:' : 'https:';
+  const host = window.location.hostname || 'localhost';
+  return `${protocol}//${host}:8000`;
+};
+const API_BASE = getApiBase();
+
 export default function App() {
   // --------------------------------------------------------------------------
   // Core Tracking & State
@@ -143,10 +154,14 @@ export default function App() {
     let reconnectTimeout: any = null;
 
     const connectWS = () => {
-      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-      // Connect to port 8000 backend
-      const host = window.location.hostname || '127.0.0.1';
-      const wsUrl = `${protocol}//${host}:8000/ws/control`;
+      let wsUrl = '';
+      if (window.location.port === '8000') {
+        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        wsUrl = `${protocol}//${window.location.host}/ws/control`;
+      } else {
+        const host = window.location.hostname || 'localhost';
+        wsUrl = `wss://${host}:8000/ws/control`;
+      }
 
       const ws = new WebSocket(wsUrl);
       wsRef.current = ws;
@@ -233,7 +248,7 @@ export default function App() {
   const pollData = useCallback(async () => {
     try {
       // 1. Dream State
-      const dreamRes = await fetch('http://localhost:8000/api/dream/status');
+      const dreamRes = await fetch(`${API_BASE}/api/dream/status`);
       if (dreamRes.ok) {
         const d = await dreamRes.json();
         setDreamStatus(d);
@@ -243,7 +258,7 @@ export default function App() {
       }
 
       // 2. Mobile Bridge Status
-      const mobRes = await fetch('http://localhost:8000/api/mobile/status');
+      const mobRes = await fetch(`${API_BASE}/api/mobile/status`);
       if (mobRes.ok) {
         const m = await mobRes.json();
         setSoulState(m.soul_location || 'desktop');
@@ -251,7 +266,7 @@ export default function App() {
       }
 
       // 3. Recent Memories
-      const memRes = await fetch('http://localhost:8000/api/dream/memory');
+      const memRes = await fetch(`${API_BASE}/api/dream/memory`);
       if (memRes.ok) {
         const mem = await memRes.json();
         if (mem.interactions) {
@@ -274,7 +289,7 @@ export default function App() {
     const fetchOllama = async () => {
       setOllamaStatus('checking');
       try {
-        const res = await fetch('http://localhost:8000/api/ollama/models');
+        const res = await fetch(`${API_BASE}/api/ollama/models`);
         if (res.ok) {
           const data = await res.json();
           if (data.status === 'online' && data.models?.length > 0) {
@@ -324,7 +339,7 @@ export default function App() {
     const target = soulState === 'desktop' ? 'mobile' : 'desktop';
     setSoulState(target);
     try {
-      await fetch('http://localhost:8000/api/mobile/transfer', {
+      await fetch(`${API_BASE}/api/mobile/transfer`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ target }),
@@ -339,7 +354,7 @@ export default function App() {
   const triggerDreamStateNow = async () => {
     setIsDreaming(true);
     try {
-      await fetch('http://localhost:8000/api/dream/trigger', {
+      await fetch(`${API_BASE}/api/dream/trigger`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ model: selectedModel }),
@@ -378,7 +393,7 @@ export default function App() {
     setIsAiLoading(true);
 
     try {
-      const res = await fetch('http://localhost:8000/api/ollama/chat', {
+      const res = await fetch(`${API_BASE}/api/ollama/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -442,7 +457,7 @@ export default function App() {
     setChatMessages((prev) => [...prev, userMsg]);
 
     try {
-      const res = await fetch('http://localhost:8000/api/vision/capture', {
+      const res = await fetch(`${API_BASE}/api/vision/capture`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -730,7 +745,7 @@ export default function App() {
             <div className="relative aspect-video bg-black/60 overflow-hidden flex items-center justify-center">
               {cameraEnabled ? (
                 <img
-                  src="http://localhost:8000/api/video_feed"
+                  src={`${API_BASE}/api/video_feed`}
                   alt="Live Vision Stream"
                   className="w-full h-full object-cover"
                 />
